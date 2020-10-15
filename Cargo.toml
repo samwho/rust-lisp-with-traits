@@ -1,5 +1,5 @@
 [package]
-name = "lollisp"
+name = "lisp"
 version = "0.1.0"
 authors = ["Sam Rose <sam@cvpartner.com>"]
 edition = "2018"
