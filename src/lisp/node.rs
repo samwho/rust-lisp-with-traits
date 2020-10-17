@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData};
+use std::collections::HashMap;
 
 pub trait Node {
     type Return;
@@ -95,63 +95,16 @@ impl<K, V> Node for HashMap<K, V> {
     }
 }
 
-struct FAR<F, A, R>
-where
-    F: Fn(A) -> R,
-{
-    f: F,
-    a: PhantomData<A>,
-}
-
-impl<F, A, R> From<F> for FAR<F, A, R>
-where
-    F: Fn(A) -> R,
-{
-    fn from(f: F) -> Self {
-        FAR { f, a: PhantomData }
-    }
-}
-
-impl<F, A, R> Node for FAR<F, A, R>
-where
-    F: Fn(A) -> R,
-{
-    type Return = F;
-
+impl<A, R> Node for Box<dyn Fn(A) -> R> {
+    type Return = Self;
     fn eval(self) -> Self::Return {
-        self.f
+        self
     }
 }
 
-struct FAAR<F, A1, A2, R>
-where
-    F: Fn(A1, A2) -> R,
-{
-    f: F,
-    a1: PhantomData<A1>,
-    a2: PhantomData<A2>,
-}
-
-impl<F, A1, A2, R> From<F> for FAAR<F, A1, A2, R>
-where
-    F: Fn(A1, A2) -> R,
-{
-    fn from(f: F) -> Self {
-        FAAR {
-            f,
-            a1: PhantomData,
-            a2: PhantomData,
-        }
-    }
-}
-
-impl<F, A1, A2, R> Node for FAAR<F, A1, A2, R>
-where
-    F: Fn(A1, A2) -> R,
-{
-    type Return = F;
-
+impl<T> Node for Box<T> {
+    type Return = T;
     fn eval(self) -> Self::Return {
-        self.f
+        *self
     }
 }
