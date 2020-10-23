@@ -95,16 +95,9 @@ impl<K, V> Node for HashMap<K, V> {
     }
 }
 
-impl<A, R> Node for Box<dyn Fn(A) -> R> {
+impl<A, R> Node for fn(A) -> R {
     type Return = Self;
     fn eval(self) -> Self::Return {
         self
-    }
-}
-
-impl<T> Node for Box<T> {
-    type Return = T;
-    fn eval(self) -> Self::Return {
-        *self
     }
 }
