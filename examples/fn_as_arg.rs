@@ -10,5 +10,5 @@ fn hello(name: String) {
 
 fn main() {
     let name = "Sam".to_owned();
-    eval((run, Box::new(hello), name));
+    eval((run, hello as fn(_), name));
 }
