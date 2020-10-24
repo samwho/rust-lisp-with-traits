@@ -10,6 +10,5 @@ fn hello(name: String) {
 
 fn main() {
     let name = "Sam".to_owned();
-    let hello: fn(String) = hello;
-    eval((run, hello, name));
+    eval((run, hello as fn(_), name));
 }

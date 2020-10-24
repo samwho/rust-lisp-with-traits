@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 pub trait Node {
     type Return;
@@ -100,4 +101,48 @@ impl<A, R> Node for fn(A) -> R {
     fn eval(self) -> Self::Return {
         self
     }
+}
+
+impl<A1, A2, R> Node for fn(A1, A2) -> R {
+    type Return = Self;
+    fn eval(self) -> Self::Return {
+        self
+    }
+}
+
+struct Lambda0<R, F: Fn() -> R>(F, PhantomData<R>);
+struct Lambda1<A, R, F: Fn(A) -> R>(F, PhantomData<R>, PhantomData<A>);
+struct Lambda2<A1, A2, R, F: Fn(A1, A2) -> R>(F, PhantomData<R>, PhantomData<A1>, PhantomData<A2>);
+
+impl<R, F: Fn() -> R> Node for Lambda0<R, F> {
+    type Return = R;
+    fn eval(self) -> Self::Return {
+        self.0()
+    }
+}
+
+impl<A, R, F: Fn(A) -> R> Node for Lambda1<A, R, F> {
+    type Return = F;
+    fn eval(self) -> Self::Return {
+        self.0
+    }
+}
+
+impl<A1, A2, R, F: Fn(A1, A2) -> R> Node for Lambda2<A1, A2, R, F> {
+    type Return = F;
+    fn eval(self) -> Self::Return {
+        self.0
+    }
+}
+
+pub fn lambda<A, R, F: Fn(A) -> R>(f: F) -> impl Node<Return = F> {
+    Lambda1(f, PhantomData, PhantomData)
+}
+
+pub fn lambda2<A1, A2, R, F: Fn(A1, A2) -> R>(f: F) -> impl Node<Return = F> {
+    Lambda2(f, PhantomData, PhantomData, PhantomData)
+}
+
+pub fn lazy<R, F: Fn() -> R>(f: F) -> impl Node<Return = R> {
+    Lambda0(f, PhantomData)
 }
